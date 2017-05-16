@@ -3,7 +3,7 @@ import {
   AppRegistry,
   StyleSheet,
   Text,
-  View
+  ScrollView
 } from 'react-native';
 import p2pkit from 'react-native-p2pkit';
 
@@ -99,7 +99,7 @@ export default class Vista extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.welcome}>
           Discovered Peers:
         </Text>
@@ -109,7 +109,7 @@ export default class Vista extends Component {
         <Text style={styles.instructions}>
           {this.state.log.join('\n')}
         </Text>
-      </View>
+      </ScrollView>
     );
   }
 }
