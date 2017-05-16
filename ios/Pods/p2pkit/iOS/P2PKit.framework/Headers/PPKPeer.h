@@ -2,7 +2,7 @@
  * PPKPeer.h
  * P2PKit
  *
- * Copyright (c) 2016 by Uepaa AG, Zürich, Switzerland.
+ * Copyright (c) 2017 by Uepaa AG, Zürich, Switzerland.
  * All rights reserved.
  *
  * We reserve all rights in this document and in the information contained therein.
@@ -50,14 +50,14 @@ typedef NS_ENUM(NSInteger, PPKProximityStrength) {
 @interface PPKPeer : NSObject
 
 /*!
- *  @abstract       A unique identifier for the peer.
+ *  @abstract       A unique identifier for the peer. P2PKit generates this ID when you enable <code> PPKController </code> for the first time. When the app is re-installed a new ID is generated.
  */
-@property (readonly) NSString *peerID;
+@property (readonly, nonnull) NSString *peerID;
 
 /*!
  *  @abstract       A <code>NSData</code> object containing the discovery info of the peer (can be nil if the peer does not provide a discovery info).
  */
-@property (readonly) NSData *discoveryInfo;
+@property (readonly, nullable) NSData *discoveryInfo;
 
 /*!
  *  @abstract       Indicates the current Proximity Strength of the peer.

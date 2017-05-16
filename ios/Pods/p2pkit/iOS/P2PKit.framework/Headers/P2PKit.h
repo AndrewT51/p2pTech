@@ -2,7 +2,7 @@
  * P2PKit.h
  * P2PKit
  *
- * Copyright (c) 2016 by Uepaa AG, Zürich, Switzerland.
+ * Copyright (c) 2017 by Uepaa AG, Zürich, Switzerland.
  * All rights reserved.
  *
  * We reserve all rights in this document and in the information contained therein.
