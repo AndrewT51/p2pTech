@@ -4,6 +4,7 @@ import Header from './components/Header';
 import SetMessage from './components/SetMessage';
 import base64 from 'base-64';
 import PouchDB from 'pouchdb-react-native';
+import CheckBoxList from './components/lists/CheckBoxList';
 
 import {
   StyleSheet,
@@ -26,6 +27,8 @@ let testPeers = {
     message: 'Another message'
   }
 };
+
+let options = [ 'Bed', 'Breakfast', 'Vegetarian', 'Vegan', 'Nut Allergy', 'Other' ];
 
 const localDB = new PouchDB('other');
 const remoteDB = new PouchDB('http://andrewt51:TcSoTm1@localhost:5984/other');
@@ -54,7 +57,8 @@ export default class App extends Component {
       displayMessage:'',
       message: '',
       counting:false,
-      objDiscoveredPeers: testPeers
+      objDiscoveredPeers: testPeers,
+      userPrefs: {}
     };
 
     this.p2pkitCallback = {
@@ -117,21 +121,17 @@ export default class App extends Component {
     };
   }
 
-  // addObjectKey(obj, key){
-  //   let newThing = Object.assign({}, obj, key );
-  //   console.log('New:', newThing);
-  //   console.log('obj:', obj);
-  // }
+  editUserPrefs(newKeyValuePair){
+    let userPrefs = {
+      userPrefs: Object.assign({}, this.state.userPrefs, newKeyValuePair)
+    };
+    this.setState( Object.assign({}, this.state, userPrefs ));
+  }
 
   startP2PKit = () => {
     console.log('this.p2pkitCallback', this.p2pkitCallback);
     p2pkit.enable('f80a76326b5d4cf69a635ba88780e7fd', this.p2pkitCallback);
   }
-
-  // componentDidMount() {
-  //   // this.startP2PKit()
-  //   setTimeout( () => this.test(), 5000)
-  // }
 
   updatePeersInfo(peer){
     const { peerID, proximityStrength, discoveryInfo } = peer;
@@ -230,6 +230,12 @@ export default class App extends Component {
   }
 
   componentDidMount(){
+    let prefs = {};
+    options.forEach((option) => {
+      option = option.toLowerCase()
+      prefs[option] = Math.random() > .5;
+    });
+    this.setState({userPrefs: prefs});
     // localDB.changes({
     //   live: true,
     //   include_docs: true //Include all fields in the doc field
@@ -249,7 +255,7 @@ export default class App extends Component {
     }
 
     if (doc._deleted) {
-      this.removeDoc(doc);
+      // this.removeDoc(doc);
     } else {
       this.addDoc(doc);
     }
@@ -295,6 +301,11 @@ export default class App extends Component {
           proximity={ this.state.proximity }
           objectPeers={this.state.objDiscoveredPeers}
           searchForPeerType={ this.peerTypes[+!this.state.isKiosk]}
+        />
+        <CheckBoxList
+          userPrefs={ this.state.userPrefs }
+          onChange={ this.editUserPrefs.bind(this) }
+
         />
         <View style={styles.messageInfo}>
           <Text style={{fontSize:20}}>{this.state.displayMessage || ''}</Text>
