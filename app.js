@@ -3,12 +3,14 @@ import PeerStatusBlockList from './components/lists/PeerStatusBlockList';
 import Header from './components/Header';
 import SetMessage from './components/SetMessage';
 import base64 from 'base-64';
+import PouchDB from 'pouchdb-react-native';
+
 import {
   StyleSheet,
   Text,
   View,
   Button,
-  StatusBar,
+  StatusBar
 } from 'react-native';
 import p2pkit from 'react-native-p2pkit';
 
@@ -25,11 +27,24 @@ let testPeers = {
   }
 };
 
+const localDB = new PouchDB('other');
+const remoteDB = new PouchDB('http://andrewt51:TcSoTm1@localhost:5984/other');
+
+localDB.sync(remoteDB, {
+  live: true,
+  retry: true
+});
+
 export default class App extends Component {
   constructor(props){
     super(props);
 
     this.peerTypes = [ 'Client', 'Kiosk' ];
+
+    localDB.changes({
+      live: true,
+      include_docs: true //Include all fields in the doc field
+    }).on('change', this.handleChange.bind(this))
 
     this.state = {
       isKiosk: true,
@@ -174,6 +189,8 @@ export default class App extends Component {
         this.timer = setTimeout(this.pushDiscoveryInfo.bind(this), 60000);
       }
     });
+    this.onDocSubmit( this.state.text);
+
   }
 
   removeObjectKey(key){
@@ -205,8 +222,58 @@ export default class App extends Component {
     const stringifiedData = JSON.stringify(peerData);
     return base64.encode(stringifiedData);
   }
+/*-----------------------------------------------------------------------------*/
+  onDocSubmit(doc){
+    console.log('Doc', doc);
+    localDB.put({_id: doc, content: doc, value: doc })
+      .catch(console.log.bind(console, 'Error inserting'));
+  }
+
+  componentDidMount(){
+    // localDB.changes({
+    //   live: true,
+    //   include_docs: true //Include all fields in the doc field
+    // }).on('change', this.handleChange.bind(this))
+  }
+
+  // handleChange(change){
+  //   this.setState({ displayMessage:change.id})
+  //   console.log('Change occurred', change)
+  // }
+
+  handleChange(change){
+    var doc = change.doc;
+
+    if (!doc) {
+      return;
+    }
+
+    if (doc._deleted) {
+      this.removeDoc(doc);
+    } else {
+      this.addDoc(doc);
+    }
+    this.setState({displayMessage: doc.value});
+  }
+
+  addDoc(newDoc){
+    console.log('NewDoc', newDoc);
+    // if (!_.find(this.state.docs, '_id', newDoc._id)) {
+    //   this.setState({
+    //     displayMessage: newDoc
+    //   });
+    // // }
+  }
+
+  removeDoc(oldDoc){
+    this.setState({
+      docs: this.state.docs.filter(doc => doc._id !== oldDoc._id)
+    });
+  }
+/*------------------------------------------------------------------------------*/
 
   render(){
+    // this.onDocSubmit('Marvellous');
     return (
       <View style= {styles.container}>
         <StatusBar hidden />
