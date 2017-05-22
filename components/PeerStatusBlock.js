@@ -1,39 +1,59 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
+import StatusLight from './StatusLight';
+
 import {
   StyleSheet,
   Text,
-  ScrollView,
   View,
-  Button
-} from 'react-native'
-
-
+  TouchableHighlight
+} from 'react-native';
 
 export default class PeerStatusBlock extends Component {
 
+  updateMessage(){
+    const { onPressPeer, message } = this.props;
+    onPressPeer(message);
+  }
 
   render(){
-    return (
-      <View style={ styles.peerBlock }>
-        <Text style={ styles.userID }>
-          User: {this.props.peerID.split('-')[0]}
-        </Text>
+    const { searchForPeerType, peerID, proximity } = this.props;
+    const colours = [ 'white', 'red', 'red', 'orange', 'green', 'green' ];
 
-      </View>
-    )
+    return (
+      <TouchableHighlight
+        onPress={ this.updateMessage.bind(this) }
+      >
+        <View style={ styles.peerBlock }>
+          <Text style={ styles.userID }>
+            { searchForPeerType }: {peerID.split('-')[0]}
+          </Text>
+          <View style={styles.statusLight} >
+            <StatusLight colour={colours[proximity] }/>
+          </View>
+        </View>
+      </TouchableHighlight>
+    );
   }
 }
 
 const styles = StyleSheet.create({
 
-
   userID: {
+    flex:5,
     marginLeft: 15,
-    justifyContent: 'center',
   },
-
+  statusLight:{
+    flex: 1,
+  },
   peerBlock: {
-    backgroundColor: 'green',
+    flexDirection: 'row',
+    backgroundColor: '#E8FFFF',
+    borderWidth: 1,
+    borderColor: 'lightgrey',
+    borderRadius: 5,
+    marginLeft: 3,
+    marginRight: 3,
+    alignItems:'center',
     justifyContent: 'center',
     height: 50,
     marginTop: 2,

@@ -4,23 +4,22 @@ import {
   Text,
   View,
   Switch
-} from 'react-native'
+} from 'react-native';
 
 export default class Header extends Component {
-  state = {
-    switchStatus: true
-  }
+
   render(){
+          // onValueChange={(val) => this.setState({switchStatus: val})}
     return(
       <View style={styles.header}>
-        <Text style={styles.headerText }>Header</Text>
+        <Text style={styles.headerText }>{this.props.peerType}</Text>
         <Switch
           style={ styles.switch }
-          onValueChange={(val) => this.setState({switchStatus: val})}
-          value={this.state.switchStatus}
+          onValueChange={this.props.switchType}
+          value={this.props.isKiosk}
         />
       </View>
-    )
+    );
   }
 }
 

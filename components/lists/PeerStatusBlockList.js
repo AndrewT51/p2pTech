@@ -1,39 +1,39 @@
-import React, { Component } from 'react'
-import PeerStatusBlock from '../PeerStatusBlock'
+import React, { Component } from 'react';
+import PeerStatusBlock from '../PeerStatusBlock';
 import {
   StyleSheet,
-  Text,
   ScrollView,
   View,
-  Button
-} from 'react-native'
-
+} from 'react-native';
 
 export default class PeerStatusBlockList extends Component {
-
-  renderBlocks(){
-    if ( !this.props.peers.length ) return null
-    return (
-     this.props.peers.map((peer) => {
-        return <PeerStatusBlock peerID={peer} key={peer} proximity={this.props.proximity} />
-      })
-    )
+  renderObjectBlocksInOrder(){
+    const { objectPeers, onPressPeer, searchForPeerType } = this.props;
+    return Object.keys(objectPeers).sort((key1, key2) => objectPeers[key2].range - objectPeers[key1].range)
+    .map( peerID => <PeerStatusBlock
+      peerID={peerID}
+      key={peerID}
+      proximity={objectPeers[peerID].range}
+      message={objectPeers[peerID].message}
+      onPressPeer={onPressPeer}
+      searchForPeerType={searchForPeerType}
+    />);
   }
 
   render(){
     return (
-      <View style={styles.container}>
-        {this.renderBlocks.call(this)}
+      <View style={styles.listContainer}>
+        <ScrollView style={styles.container}>
+            {this.renderObjectBlocksInOrder.call(this)}
+        </ScrollView>
       </View>
-    )
+    );
   }
 }
 
 const styles = StyleSheet.create({
-  container: {
-    // justifyContent: 'center',
-    // alignSelf: 'stretch'
-
+  listContainer: {
+    flex:1,
+    flexDirection:'row'
   },
 });
-

@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "atob": "^2.0.3",
+    "babel-eslint": "^7.2.3",
     "base-64": "^0.1.0",
     "react": "16.0.0-alpha.6",
     "react-native": "0.44.0",
@@ -17,6 +18,8 @@
   "devDependencies": {
     "babel-jest": "20.0.1",
     "babel-preset-react-native": "1.9.2",
+    "eslint": "^3.19.0",
+    "eslint-plugin-react": "^7.0.1",
     "jest": "20.0.1",
     "react-test-renderer": "16.0.0-alpha.6"
   },
