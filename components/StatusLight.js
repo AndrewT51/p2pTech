@@ -1,17 +1,17 @@
-import React, { Component } from 'react'
+import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-} from 'react-native'
+} from 'react-native';
 
 export default class StatusLight extends Component {
   render(){
     return(
       <View
-        style={[{backgroundColor: this.props.colour},styles.status]}
+        style={[ {backgroundColor: this.props.colour}, styles.status ]}
       >
       </View>
-    )
+    );
   }
 }
 

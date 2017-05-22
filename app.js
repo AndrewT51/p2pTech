@@ -110,7 +110,7 @@ export default class App extends Component {
 
   startP2PKit = () => {
     console.log('this.p2pkitCallback', this.p2pkitCallback);
-    p2pkit.enable('f80a76326b5d4cf69a635ba88780e7fd', this.p2pkitCallback);
+    p2pkit.enable(/* insert p2p key here */, this.p2pkitCallback);
   }
 
   // componentDidMount() {
