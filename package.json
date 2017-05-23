@@ -10,6 +10,7 @@
     "atob": "^2.0.3",
     "babel-eslint": "^7.2.3",
     "base-64": "^0.1.0",
+    "cloudant": "^1.7.1",
     "pouchdb": "^6.2.0",
     "pouchdb-react-native": "^6.2.4",
     "react": "16.0.0-alpha.6",

@@ -28,14 +28,20 @@ let testPeers = {
   }
 };
 
-let options = [ 'Bed', 'Breakfast', 'Vegetarian', 'Vegan', 'Nut Allergy', 'Other' ];
-
-const localDB = new PouchDB('other');
-const remoteDB = new PouchDB('http://andrewt51:TcSoTm1@localhost:5984/other');
+// let options = [ 'Bed', 'Breakfast', 'Vegetarian', 'Vegan', 'Nut Allergy', 'Other' ];
+let userId = 'test-user-123456';
+const localDB = new PouchDB('techspike');
+const remoteDB = new PouchDB('https://andrewt51.cloudant.com/techspike');
 
 localDB.sync(remoteDB, {
   live: true,
   retry: true
+})
+.on('change', (change) => {
+  console.log('Hello', change);
+})
+.on('error', (err) => {
+  console.log('Error', err);
 });
 
 export default class App extends Component {
@@ -43,12 +49,6 @@ export default class App extends Component {
     super(props);
 
     this.peerTypes = [ 'Client', 'Kiosk' ];
-
-    localDB.changes({
-      live: true,
-      include_docs: true //Include all fields in the doc field
-    }).on('change', this.handleChange.bind(this))
-
     this.state = {
       isKiosk: true,
       isActive: false,
@@ -126,6 +126,8 @@ export default class App extends Component {
       userPrefs: Object.assign({}, this.state.userPrefs, newKeyValuePair)
     };
     this.setState( Object.assign({}, this.state, userPrefs ));
+    this.onDocSubmit();
+
   }
 
   startP2PKit = () => {
@@ -189,8 +191,6 @@ export default class App extends Component {
         this.timer = setTimeout(this.pushDiscoveryInfo.bind(this), 60000);
       }
     });
-    this.onDocSubmit( this.state.text);
-
   }
 
   removeObjectKey(key){
@@ -223,63 +223,50 @@ export default class App extends Component {
     return base64.encode(stringifiedData);
   }
 /*-----------------------------------------------------------------------------*/
-  onDocSubmit(doc){
-    console.log('Doc', doc);
-    localDB.put({_id: doc, content: doc, value: doc })
-      .catch(console.log.bind(console, 'Error inserting'));
+  onDocSubmit(){
+    localDB.get(userId)
+    .then( doc => {
+      localDB.put({
+        _id: userId,
+        _rev: doc._rev,
+        value: this.state.userPrefs
+      });
+    })
+    .catch(err => {
+      if (err.name == 'not_found') {
+        localDB.put({
+          _id: userId,
+          value: this.state.userPrefs
+        });
+      }
+    });
   }
 
   componentDidMount(){
-    let prefs = {};
-    options.forEach((option) => {
-      option = option.toLowerCase()
-      prefs[option] = Math.random() > .5;
-    });
-    this.setState({userPrefs: prefs});
-    // localDB.changes({
-    //   live: true,
-    //   include_docs: true //Include all fields in the doc field
-    // }).on('change', this.handleChange.bind(this))
-  }
 
-  // handleChange(change){
-  //   this.setState({ displayMessage:change.id})
-  //   console.log('Change occurred', change)
-  // }
+    localDB.changes({
+      live: true,
+      include_docs: true //Include all fields in the doc field
+    }).on('change', this.handleChange.bind(this));
+  }
 
   handleChange(change){
     var doc = change.doc;
-
-    if (!doc) {
-      return;
+    if ( doc.value) {
+      this.setState({userPrefs: doc.value});
     }
-
-    if (doc._deleted) {
-      // this.removeDoc(doc);
-    } else {
-      this.addDoc(doc);
-    }
-    this.setState({displayMessage: doc.value});
   }
 
-  addDoc(newDoc){
-    console.log('NewDoc', newDoc);
-    // if (!_.find(this.state.docs, '_id', newDoc._id)) {
-    //   this.setState({
-    //     displayMessage: newDoc
-    //   });
-    // // }
-  }
-
-  removeDoc(oldDoc){
-    this.setState({
-      docs: this.state.docs.filter(doc => doc._id !== oldDoc._id)
-    });
-  }
 /*------------------------------------------------------------------------------*/
+  renderCheckBoxes(){
+    if ( this.state.peerType !== 'Client') { return null; }
+    return <CheckBoxList
+      userPrefs={ this.state.userPrefs }
+      onChange={ this.editUserPrefs.bind(this) }
+    />;
+  }
 
   render(){
-    // this.onDocSubmit('Marvellous');
     return (
       <View style= {styles.container}>
         <StatusBar hidden />
@@ -302,11 +289,7 @@ export default class App extends Component {
           objectPeers={this.state.objDiscoveredPeers}
           searchForPeerType={ this.peerTypes[+!this.state.isKiosk]}
         />
-        <CheckBoxList
-          userPrefs={ this.state.userPrefs }
-          onChange={ this.editUserPrefs.bind(this) }
-
-        />
+        { this.renderCheckBoxes() }
         <View style={styles.messageInfo}>
           <Text style={{fontSize:20}}>{this.state.displayMessage || ''}</Text>
         </View>
@@ -336,7 +319,6 @@ const styles = StyleSheet.create({
     margin: 3,
     justifyContent: 'center',
     alignItems: 'center',
-    // marginBottom: 3,
     alignSelf:'stretch'
   },
 
